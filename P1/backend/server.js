@@ -4,16 +4,12 @@ const connectDB = require("./config/dbConfig");
 
 const app = express();
 
-// Connect to MongoDB
+// mongoDB
 connectDB();  // Calls the function from dbConfig.js
-
-// Middleware: parse JSON bodies
 app.use(express.json());
-
-// Serve static files – for instance, your frontend files from the main folder
 app.use(express.static(path.join(__dirname, "../")));
 
-// API routes
+// api routes -b
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
 

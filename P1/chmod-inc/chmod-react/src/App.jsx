@@ -4,14 +4,17 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Orders from './pages/Orders';
 import Products from './pages/Products';
+import Employee from './pages/Employee'; // Import the new Employee component
 import './App.css';
-import logo from './assets/logo.png'; // Create or add a logo image
+import logo from './assets/logo.png';
 
 function App() {
   const [scrolled, setScrolled] = useState(false);
   const [products, setProducts] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
-  // Handle scroll effect for header
+  // scroll effect stuff
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
@@ -30,7 +33,7 @@ function App() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/products'); // Call the Express API
+        const response = await fetch('http://localhost:3000/api/products'); // Call the Express servers api
         const data = await response.json();
         setProducts(data); // Set the fetched products
       } catch (err) {
@@ -39,6 +42,41 @@ function App() {
     };
 
     fetchProducts();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      const response = await fetch('http://localhost:3000/api/auth/user', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      } else {
+        // token could expire 
+        localStorage.removeItem('token');
+        setIsAuthenticated(false);
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+      fetchUserData();
+    }
   }, []);
 
   return (
@@ -54,7 +92,11 @@ function App() {
                 <li><Link to="/">Home</Link></li>
                 <li><Link to="/products">Products</Link></li>
                 <li><Link to="/about">About Us</Link></li>
+                <li><Link to="/employee">Employee Portal</Link></li> 
                 <li><Link to="/orders" className="cta-button">Orders</Link></li>
+                {isAuthenticated && user?.role === 'admin' && (
+                  <li><Link to="/employee" className="admin-link">Employee Portal</Link></li>
+                )}
               </ul>
             </nav>
           </div>
@@ -65,6 +107,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/products" element={<Products products={products} />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path="/employee" element={<Employee />} />
           </Routes>
         </main>
         <footer className="footer">

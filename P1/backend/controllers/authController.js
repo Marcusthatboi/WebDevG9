@@ -8,18 +8,18 @@ const generateToken = (id) => {
   });
 };
 
-// Register a new user
+// register a new user
 exports.register = async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    // Check if user already exists
+    // check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists with this email' });
     }
 
-    // Create new user
+    // create new user
     const user = await User.create({ username, email, password });
 
     res.status(201).json({ message: 'User registered successfully', user });
@@ -29,28 +29,28 @@ exports.register = async (req, res) => {
   }
 };
 
-// Login user
+// Login 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Find user and validate password
+    //validate password
     const user = await User.findOne({ email }).select('+password');
     if (!user || !(await user.isPasswordCorrect(password))) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Generate JWT token
+
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
-    // Set cookie
+    // Set cookie (dont work !)
     res.cookie('token', token, {
-      httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
-      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-      sameSite: 'Strict', // Prevent CSRF attacks
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      httpOnly: true, 
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: 'Strict', 
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({ message: 'Login successful', token });
@@ -59,7 +59,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// Get current user
+// Logout
 exports.getMe = async (req, res) => {
   try {
     // User is already available in req.user from protect middleware

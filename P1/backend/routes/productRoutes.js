@@ -1,21 +1,29 @@
 // backend/routes/productRoutes.js
-const express = require("express");
+const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
-const productController = require("../controllers/productController");
+const Product = require('../models/productModel');
 
-// GET all products
-router.get("/", productController.getProducts);
+// MongoDB connection
+mongoose
+  .connect(process.env.MONGO_URI || 'mongodb://localhost/chmod-inc', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('Connected to MongoDB:', mongoose.connection.name))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
-// GET a single product by productId
-router.get("/:id", productController.getProductById);
-
-// POST a new product
-router.post("/", productController.createProduct);
-
-// PUT update a product by productId
-router.put("/:id", productController.updateProduct);
-
-// DELETE a product by productId
-router.delete("/:id", productController.deleteProduct);
+// Debug logs
+router.get('/', async (req, res) => {
+  try {
+    console.log('GET /api/products route hit');
+    const products = await Product.find();
+    console.log(`Found ${products.length} products:`, products); // Log the products
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;

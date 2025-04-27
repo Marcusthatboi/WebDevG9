@@ -1,30 +1,43 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
+const User = require('../models/userModel'); // syntax for user model is a bit messed up, but it works
 
-exports.protect = async (req, res, next) => {
+const protect = async (req, res, next) => {
   try {
-    const token = req.cookies.token; // Get token from cookies
-
+    let token;
+    
+    // checks for token
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      try {
+        // gets token from header
+        token = req.headers.authorization.split(' ')[1];
+        
+        // verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-default-secret');
+        
+        // get user from token
+        req.user = await User.findById(decoded.userId).select('-password');
+        
+        next();
+      } catch (error) {
+        console.error(error);
+        res.status(401).json({ message: 'Not authorized, token failed' });
+      }
+    }
+    
     if (!token) {
-      return res.status(401).json({ message: 'Not authorized, no token' });
+      res.status(401).json({ message: 'Not authorized, no token' });
     }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    const currentUser = await User.findById(decoded.id);
-    if (!currentUser) {
-      return res.status(401).json({ message: 'The user no longer exists' });
-    }
-
-    req.user = currentUser; // Attach user to request
-    next();
-  } catch (err) {
-    res.status(401).json({ message: 'Not authorized' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Check user role
-exports.restrictTo = (...roles) => {
+// check user role
+const restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
@@ -35,3 +48,5 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+module.exports = { protect, restrictTo };
