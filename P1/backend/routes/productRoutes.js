@@ -26,4 +26,9 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Example route
+router.get("/", (req, res) => {
+  res.send("Product routes are working!");
+});
+
 module.exports = router;
