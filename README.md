@@ -5,6 +5,12 @@
 TechStore - E-Commerce Application
 TechStore is a full-stack e-commerce application that offers tech products such as hardware, software, bundles, services, and accessories.
 
+To Run the Program:
+npm run install-all
+npm run seed
+npm run dev
+The server will start on port 5000, and the client will run on port 3000.
+
 Features
 User Authentication: Register, login, and logout functionality
 Product Browsing: View all products with category filtering
@@ -30,12 +36,6 @@ Getting Started
 Prerequisites
 Node.js (v14+)
 MongoDB (local or Atlas connection)
-
-To Run the Program:
-npm run install-all
-npm run seed
-npm run dev
-The server will start on port 5000, and the client will run on port 3000.
 
 Available Scripts
 npm run server: Run the backend server only
