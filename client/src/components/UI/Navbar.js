@@ -26,6 +26,8 @@ const Navbar = ({ user, setUser }) => {
         <div className="navbar-links">
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/products" className="nav-link">Products</Link>
+          <Link to="/about-us" className="nav-link">About Us</Link>
+          <Link to="/contact-us" className="nav-link">Contact Us</Link>
         </div>
         
         <div className="navbar-auth">

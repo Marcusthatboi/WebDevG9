@@ -9,6 +9,8 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import Profile from './pages/Profile';
+import ContactUs from './pages/ContactUs';
+import AboutUs from './pages/AboutUs';
 import Navbar from './components/UI/Navbar';
 import Footer from './components/UI/Footer';
 import { getCurrentUser } from './api/auth';
@@ -73,6 +75,8 @@ const App = () => {
                 <Profile user={user} />
               </ProtectedRoute>
             } />
+            <Route path="/contact-us" element={<ContactUs />} />
+            <Route path="/about-us" element={<AboutUs />} />
           </Routes>
         </main>
         <Footer />
